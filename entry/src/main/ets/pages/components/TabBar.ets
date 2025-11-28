@@ -1,4 +1,5 @@
-import { router } from "@kit.ArkUI"
+// entry/src/main/ets/pages/components/TabBar.ets
+import { router } from '@kit.ArkUI'
 
 interface TabItem {
   key: string;
@@ -7,16 +8,15 @@ interface TabItem {
   page: string;
 }
 
-// entry/src/main/ets/pages/components/TabBar.ets
 @Component
 export struct TabBar {
-  private currentPage: string = 'home'
+  @State currentPage: string = 'home'
 
   private tabs: TabItem[] = [
-    { key: 'home', icon: '🏠', text: '首页', page: 'pages/HomePage' },
+    { key: 'home', icon: '🏠', text: '首页', page: 'pages/Index' },
     { key: 'map', icon: '🗺️', text: '地图', page: 'pages/MapPage' },
     { key: 'punch', icon: '📸', text: '打卡', page: 'pages/Punch' },
-    { key: 'points', icon: '🎁', text: '积分', page: 'pages/MyPointsPage' },
+    { key: 'points', icon: '🎁', text: '积分', page: 'pages/PunchCardFeedPage' },
     { key: 'profile', icon: '👤', text: '我的', page: 'pages/ProfilePage' }
   ]
 
@@ -24,8 +24,7 @@ export struct TabBar {
     Row() {
       ForEach(this.tabs, (tab: TabItem) => {
         Column() {
-          Text(tab.icon)
-            .fontSize(20)
+          Text(tab.icon).fontSize(20)
           Text(tab.text)
             .fontSize(12)
             .fontColor(this.currentPage === tab.key ? '#007DFF' : '#666666')
@@ -35,7 +34,8 @@ export struct TabBar {
         .padding(10)
         .onClick(() => {
           if (this.currentPage !== tab.key) {
-            router.replaceUrl({ url: tab.page })
+            this.currentPage = tab.key
+            router.pushUrl({ url: tab.page })   // ★ 改成 pushUrl，强制跳转
           }
         })
       })
@@ -43,6 +43,5 @@ export struct TabBar {
     .width('100%')
     .height(60)
     .backgroundColor(Color.White)
-    .shadow({ radius: 8, color: '#1A000000' })
   }
 }
