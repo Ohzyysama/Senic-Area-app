@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "ip",
+      "value": "10.4.115.71:8080"
     }
   ]
 }

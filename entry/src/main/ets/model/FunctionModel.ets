@@ -1,4 +1,6 @@
 // entry/src/main/ets/model/FunctionModel.ets
+import '../pages/Detail/IntroPage.ets'
+
 export interface FunctionItem {
   icon: Resource;
   name: string;
@@ -10,9 +12,9 @@ export class FunctionModel {
   static getMainFunctions(): FunctionItem[] {
     const functions: FunctionItem[] = [
       {
-        icon: $r('app.media.startIcon'),
+        icon: $r('app.media.intro'),
         name: '引领区介绍',
-        page: 'pages/IntroPage'
+        page: 'pages/Detail/IntroPage'
       } as FunctionItem,
       {
         icon: $r('app.media.startIcon'),
@@ -25,14 +27,14 @@ export class FunctionModel {
         page: 'pages/Punch'
       } as FunctionItem,
       {
-        icon: $r('app.media.startIcon'),
+        icon: $r('app.media.hotel'),
         name: '住宿',
-        page: 'pages/BusinessListPage',
+        page: 'pages/Detail/Accommodation',
       } as FunctionItem,
       {
-        icon: $r('app.media.startIcon'),
+        icon: $r('app.media.restaurant'),
         name: '餐饮',
-        page: 'pages/BusinessListPage',
+        page: 'pages/Detail/RestaurantPage',
       } as FunctionItem,
       {
         icon: $r('app.media.startIcon'),

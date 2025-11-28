@@ -34,9 +34,9 @@ export struct FunctionGrid {
     .justifyContent(FlexAlign.Center)
     .onClick(() => {
       // 跳转逻辑
+      console.log(item.page)
       router.pushUrl({
-        url: item.page,
-        params: item.params
+        url : item.page
       })
     })
   }

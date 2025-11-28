@@ -8,10 +8,10 @@ export struct HomeHeader {
     Row() {
       // 左侧：景区信息
       Row() {
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.mountain'))
           .width(20)
           .height(20)
-        Text('XX风景名胜区')
+        Text('双山风景区')
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .margin({ left: 8 })
@@ -28,18 +28,6 @@ export struct HomeHeader {
         .onChange((value: string) => {
           this.searchText = value
         })
-
-      // 右侧：天气信息
-      Row() {
-        Image($r('app.media.startIcon'))
-          .width(20)
-          .height(20)
-        Text(this.weatherInfo)
-          .fontSize(14)
-          .margin({ left: 4 })
-      }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.End)
     }
     .width('100%')
     .height(56)

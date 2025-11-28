@@ -13,11 +13,11 @@ export struct TabBar {
   private currentPage: string = 'home'
 
   private tabs: TabItem[] = [
-    { key: 'home', icon: '🏠', text: '首页', page: 'pages/HomePage' },
+    { key: 'home', icon: '🏠', text: '首页', page: 'pages/Index' },
     { key: 'map', icon: '🗺️', text: '地图', page: 'pages/MapPage' },
     { key: 'punch', icon: '📸', text: '打卡', page: 'pages/Punch' },
-    { key: 'points', icon: '🎁', text: '积分', page: 'pages/MyPointsPage' },
-    { key: 'profile', icon: '👤', text: '我的', page: 'pages/ProfilePage' }
+    { key: 'points', icon: '🎁', text: '积分', page: 'pages/Points/PointsMall' },
+    { key: 'profile', icon: '👤', text: '我的', page: 'pages/Individual/Profile' }
   ]
 
   build() {
@@ -35,7 +35,7 @@ export struct TabBar {
         .padding(10)
         .onClick(() => {
           if (this.currentPage !== tab.key) {
-            router.replaceUrl({ url: tab.page })
+            router.pushUrl({ url: tab.page })
           }
         })
       })

@@ -1,5 +1,12 @@
 {
   "src": [
-    "pages/Index"
+    "pages/Login",
+    "pages/Index",
+    "pages/Detail/IntroPage",
+    "pages/Detail/Accommodation",
+    "pages/Detail/RestaurantPage",
+    "pages/Register",
+    "pages/Individual/Profile",
+    "pages/Points/PointsMall"
   ]
 }

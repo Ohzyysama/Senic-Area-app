@@ -2,6 +2,7 @@ import { HomeHeader } from './components/HomeHeader'
 import { FunctionGrid } from './components/FunctionGrid'
 import { RecommendationList } from './components/RecommendationList'
 import { TabBar } from './components/TabBar'
+import {BusinessRecommendationList} from  './components/BusinessRecommendationList'
 @Entry
 @Component
 struct Index {
@@ -21,6 +22,9 @@ struct Index {
 
           // 推荐景区列表
           RecommendationList()
+
+          //推荐商家
+          BusinessRecommendationList()
 
           // 热门打卡地
           this.BuildHotSpots()
