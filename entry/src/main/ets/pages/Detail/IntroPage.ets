@@ -77,9 +77,20 @@ struct Introduction {
     }
   }
 
+  private async loadDataSequentially() {
+    console.log('开始加载数据...');
+
+    // 先加载服务器IP
+    await this.loadServerIP();
+    console.log('服务器IP加载完成:', this.serverIP);
+
+    // 然后加载用户资料
+    await this.getIntro();
+    console.log('用户资料加载完成');
+  }
+
   aboutToAppear(): void {
-    this.loadServerIP()
-    this.getIntro();
+    this.loadDataSequentially()
   }
 
   async getIntro() {

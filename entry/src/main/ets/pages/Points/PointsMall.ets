@@ -133,10 +133,22 @@ struct PointsMall {
     ['笔记本', '文具用品']
   ]);
 
+  private async loadDataSequentially() {
+    console.log('开始加载数据...');
+
+    // 先加载服务器IP
+    await this.loadServerIP();
+    console.log('服务器IP加载完成:', this.serverIP);
+
+    // 然后加载用户资料
+    await this.loadPrizeList();
+    console.log('用户资料加载完成');
+
+    await this.loadUserPoints();
+  }
+
   aboutToAppear() {
-    this.loadServerIP();
-    this.loadPrizeList();
-    this.loadUserPoints(); // 加载用户积分
+    this.loadDataSequentially()
   }
 
   build() {

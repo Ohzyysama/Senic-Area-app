@@ -16,7 +16,7 @@ interface PunchParams {
 
 @Entry
 @Component
-export default struct Punch {
+ struct Punch {
   @State spotName: string = '未知景点';
 
   private records: PunchRecord[] = [
@@ -26,13 +26,12 @@ export default struct Punch {
   ];
 
   aboutToAppear() {
-    let params: PunchParams = {};
     try {
-      params = router.getParams() as PunchParams;
-    } catch (_) {}
-
-    if (params.name) {
-      this.spotName = params.name;
+      const routerParams = router.getParams() as PunchParams;
+      this.spotName = routerParams?.name || '未知景点';
+    } catch (error) {
+      console.error('Failed to get router params:', error);
+      this.spotName = '未知景点';
     }
   }
 

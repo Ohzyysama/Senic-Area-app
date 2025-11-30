@@ -7,6 +7,9 @@
     "pages/Detail/RestaurantPage",
     "pages/Register",
     "pages/Individual/Profile",
-    "pages/Points/PointsMall"
+    "pages/Points/PointsMall",
+    "pages/MapPage",
+    "pages/PunchCardFeedPage",
+    "pages/Punch"
   ]
 }

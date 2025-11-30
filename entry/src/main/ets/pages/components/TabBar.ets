@@ -35,7 +35,15 @@ export struct TabBar {
         .padding(10)
         .onClick(() => {
           if (this.currentPage !== tab.key) {
-            router.pushUrl({ url: tab.page })
+            if (tab.key === 'punch') {
+              // 为打卡页面传递默认参数
+              router.pushUrl({
+                url: tab.page,
+                params: { name: '选择景点' }
+              });
+            } else {
+              router.pushUrl({ url: tab.page });
+            }
           }
         })
       })
