@@ -205,11 +205,11 @@ struct Punch {
             
             // 图片资源处理（photoFileId是云存储ID，这里暂时使用默认图片）
             let photoResource: Resource = $r('app.media.nankunshan');
-            // TODO: 如果photoFileId是URL，需要转换为Resource
+
             
             // 头像资源处理
             let avatarResource: Resource = $r('app.media.x1');
-            // TODO: 如果avatarUrl是URL，需要转换为Resource
+
 
             return {
               id: checkin.id,
