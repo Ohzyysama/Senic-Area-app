@@ -2,6 +2,7 @@ import router from '@ohos.router';
 import http from '@ohos.net.http';
 import promptAction from '@ohos.promptAction';
 import { common } from '@kit.AbilityKit';
+import { TabBar } from '../components/TabBar';
 
 // 后端响应接口
 interface PrizeListResponse {
@@ -156,27 +157,35 @@ struct PointsMall {
       // 顶部导航栏
       this.BuildHeader()
 
-      if (this.isLoading && this.prizeList.length === 0) {
-        this.BuildLoading()
-      } else if (this.isError && this.prizeList.length === 0) {
-        this.BuildError()
-      } else {
-        // 用户积分信息
-        this.BuildPointsInfo()
+      // 内容区域 - 使用layoutWeight填充剩余空间
+      Column() {
+        if (this.isLoading && this.prizeList.length === 0) {
+          this.BuildLoading()
+        } else if (this.isError && this.prizeList.length === 0) {
+          this.BuildError()
+        } else {
+          // 用户积分信息
+          this.BuildPointsInfo()
 
-        // 积分商城列表
-        this.BuildPrizeList()
+          // 积分商城列表 - 使用layoutWeight填充剩余空间
+          this.BuildPrizeList()
 
-        // 加载更多
-        if (this.hasMore && !this.isLoading) {
-          this.BuildLoadMore()
+          // 加载更多
+          if (this.hasMore && !this.isLoading) {
+            this.BuildLoadMore()
+          }
         }
       }
+      .layoutWeight(1)
+      .width('100%')
 
       // 积分明细弹窗
       if (this.showPointsDetail) {
         this.BuildPointsDetailModal()
       }
+
+      // 底部导航栏 - 固定在底部
+      TabBar({ currentPage: 'points' })
     }
     .width('100%')
     .height('100%')

@@ -1,11 +1,15 @@
 // entry/src/main/ets/model/FunctionModel.ets
 import '../pages/Detail/IntroPage.ets'
 
+export interface PunchTabParams {
+  tabIndex: number;
+}
+
 export interface FunctionItem {
   icon: Resource;
   name: string;
   page: string;
-  params?: object;
+  params?: PunchTabParams | object;
 }
 
 export class FunctionModel {
@@ -44,7 +48,8 @@ export class FunctionModel {
       {
         icon: $r('app.media.table'),
         name: '打卡榜单',
-        page: 'pages/PunchCardFeedPage'
+        page: 'pages/Punch',
+        params: { tabIndex: 2 } as PunchTabParams // 直接跳转到排行榜tab
       } as FunctionItem,
       {
         icon: $r('app.media.profile'),

@@ -35,9 +35,18 @@ export struct FunctionGrid {
     .onClick(() => {
       // 跳转逻辑
       console.log(item.page)
-      router.pushUrl({
-        url : item.page
-      })
+      if (item.name === '打卡榜单') {
+        // 打卡榜单直接跳转到打卡页面的排行榜部分
+        router.pushUrl({
+          url: 'pages/Punch',
+          params: { tabIndex: 2 } // 2表示排行榜tab
+        })
+      } else {
+        router.pushUrl({
+          url: item.page,
+          params: item.params
+        })
+      }
     })
   }
 }

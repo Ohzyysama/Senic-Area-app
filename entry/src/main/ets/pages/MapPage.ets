@@ -2,12 +2,33 @@
 import { router } from '@kit.ArkUI'
 import { TabBar } from '../pages/components/TabBar'
 import { SpotModel, SpotInfo } from '../model/SpotModel'
+import http from '@ohos.net.http'
+import { common } from '@kit.AbilityKit'
+
+// 后端返回的景点数据接口
+interface SpotResp {
+  id: number;
+  name: string;
+  lat: number | null;
+  lng: number | null;
+  description: string;
+  image: string;
+}
+
+// API响应接口
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
 
 @Entry
 @Component
 export default struct MapPage {
-  @State spots: SpotInfo[] = SpotModel.getAllSpots();
+  @State spots: SpotInfo[] = [];
   @State selectedSpot: SpotInfo | null = null;
+  @State isLoading: boolean = true;
+  @State serverIP: string = '';
   
   // 地图变换状态
   @State mapScale: number = 1.0;  // 缩放比例（避免与组件scale属性冲突）
@@ -19,7 +40,92 @@ export default struct MapPage {
   
   // 地图尺寸
   private mapWidth: number = 0;
-  private mapHeight: number = 450;
+  private mapHeight: number = 350;
+
+  aboutToAppear() {
+    this.loadServerIP();
+    this.loadSpots();
+  }
+
+  private async loadServerIP() {
+    this.serverIP = await this.getServerIP();
+  }
+
+  private async getServerIP(): Promise<string> {
+    try {
+      const context = getContext(this) as common.UIAbilityContext;
+      const resourceMgr = context.resourceManager;
+      const ipValue = await resourceMgr.getString($r('app.string.ip').id);
+      return ipValue;
+    } catch (error) {
+      console.error('获取服务器IP失败:', error);
+      return 'localhost:8080';
+    }
+  }
+
+  // 从后端加载景点列表
+  private async loadSpots() {
+    try {
+      await this.loadServerIP();
+      let httpRequest = http.createHttp();
+      let response = await httpRequest.request(
+        `http://${this.serverIP}/api/public/spots`
+      );
+
+      if (response.responseCode === http.ResponseCode.OK) {
+        const result: ApiResponse<SpotResp[]> = JSON.parse(response.result.toString()) as ApiResponse<SpotResp[]>;
+        
+        if (result.success && result.data && result.data.length > 0) {
+          // 将后端数据转换为前端SpotInfo格式
+          this.spots = result.data.map((spot: SpotResp, index: number) => {
+            // 根据索引计算地图上的x, y位置（如果没有经纬度，使用默认布局）
+            let x = 25 + (index % 3) * 30;
+            let y = 20 + Math.floor(index / 3) * 30;
+            
+            // 如果有经纬度，可以根据经纬度计算位置（这里简化处理，使用索引布局）
+            if (spot.lat !== null && spot.lng !== null) {
+              // 可以根据实际地图范围计算位置，这里暂时使用索引布局
+              x = 25 + (index % 3) * 30;
+              y = 20 + Math.floor(index / 3) * 30;
+            }
+
+            // 将后端图片URL转换为Resource（如果image是URL，需要处理）
+            let imageResource: Resource = $r('app.media.nankunshan'); // 默认图片
+            // 如果后端返回的是URL，这里需要根据实际情况处理
+            // 暂时使用默认图片资源
+
+            return {
+              id: spot.id,
+              name: spot.name,
+              x: x,
+              y: y,
+              description: spot.description || '暂无描述',
+              image: imageResource,
+              rating: 4.5, // 后端没有评分，使用默认值
+              visitCount: 0, // 后端没有访问次数，使用默认值
+              category: '景点', // 后端没有类别，使用默认值
+              address: '景区内', // 后端没有地址，使用默认值
+              openingHours: '全天开放', // 后端没有开放时间，使用默认值
+              ticketPrice: '免费', // 后端没有门票价格，使用默认值
+              features: [] // 后端没有特色标签，使用空数组
+            } as SpotInfo;
+          });
+        } else {
+          // 后端返回空数据，使用假数据
+          this.spots = SpotModel.getAllSpots();
+        }
+      } else {
+        // 请求失败，使用假数据
+        this.spots = SpotModel.getAllSpots();
+      }
+    } catch (error) {
+      console.error('加载景点列表失败:', error);
+      // 如果加载失败，使用本地数据作为后备
+      this.spots = SpotModel.getAllSpots();
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
   build() {
     Column() {
@@ -36,23 +142,30 @@ export default struct MapPage {
       .backgroundColor('#FFFFFF')
       .shadow({ radius: 4, color: '#1F000000', offsetX: 0, offsetY: 2 })
 
-      // 地图区域 - 可缩放和移动
+      // 地图区域 - 可缩放和移动（固定高度，确保不滑动能看到）
       Stack() {
         // 地图容器
         Stack() {
           Image($r('app.media.map'))
             .width('100%')
-            .height(450)
+            .height(350)
             .objectFit(ImageFit.Cover)
             .id('mapImage')
 
           // 景点标记
-          ForEach(this.spots, (spot: SpotInfo) => {
-            this.BuildSpotMarker(spot)
-          }, (item: SpotInfo) => item.id.toString())
+          if (this.isLoading) {
+            LoadingProgress()
+              .width(40)
+              .height(40)
+              .color('#007DFF')
+          } else {
+            ForEach(this.spots, (spot: SpotInfo) => {
+              this.BuildSpotMarker(spot)
+            }, (item: SpotInfo) => item.id.toString())
+          }
         }
         .width('100%')
-        .height(450)
+        .height(350)
         .clip(true)
         .scale({ x: this.mapScale, y: this.mapScale, centerX: '50%', centerY: '50%' })
         .translate({ x: this.offsetX / this.mapScale, y: this.offsetY / this.mapScale })
@@ -96,8 +209,8 @@ export default struct MapPage {
         )
       }
       .width('100%')
-      .height(450)
-      .margin({ top: 10, bottom: 10 })
+      .height(350)
+      .margin({ top: 10, bottom: 5 })
       .onAreaChange((oldValue: Area, newValue: Area) => {
         // 获取地图容器的实际宽度
         if (newValue && newValue.width !== undefined) {
@@ -152,31 +265,42 @@ export default struct MapPage {
       }
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .padding({ top: 8, bottom: 8 })
+      .padding({ top: 5, bottom: 5 })
 
-      // 景点列表卡片 - 横向滑动
+      // 景点列表卡片 - 横向滑动（固定高度，确保不滑动能看到）
       Column() {
         Text('景点推荐')
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor('#333333')
           .width('100%')
-          .padding({ left: 16, top: 12, bottom: 8 })
+          .padding({ left: 16, top: 8, bottom: 6 })
         
         Scroll() {
           Row({ space: 12 }) {
-            ForEach(this.spots, (spot: SpotInfo) => {
-              this.BuildSpotCard(spot)
-            }, (item: SpotInfo) => item.id.toString())
+            if (this.isLoading) {
+              LoadingProgress()
+                .width(30)
+                .height(30)
+                .color('#007DFF')
+            } else if (this.spots.length === 0) {
+              Text('暂无景点数据')
+                .fontSize(14)
+                .fontColor('#999999')
+                .padding(20)
+            } else {
+              ForEach(this.spots, (spot: SpotInfo) => {
+                this.BuildSpotCard(spot)
+              }, (item: SpotInfo) => item.id.toString())
+            }
           }
           .padding({ left: 16, right: 16, bottom: 16 })
         }
         .scrollable(ScrollDirection.Horizontal)
         .scrollBar(BarState.Auto)
         .width('100%')
-        .height(180)
+        .height(160)
       }
-      .layoutWeight(1)
 
       TabBar({ currentPage: 'map' })
     }
@@ -229,12 +353,6 @@ export default struct MapPage {
           .fontSize(11)
           .fontColor('#666666')
           .width('100%')
-
-        // 访问量
-        Text(`${spot.visitCount}人访问`)
-          .fontSize(10)
-          .fontColor('#999999')
-          .width('100%')
       }
       .width('100%')
       .padding({ top: 8, left: 4, right: 4, bottom: 4 })
@@ -268,21 +386,16 @@ export default struct MapPage {
       .borderRadius(20 * this.mapScale)
       .shadow({ radius: 4, color: '#40000000', offsetX: 0, offsetY: 2 })
 
-      // 景点名称标签
+      // 景点名称标签 - 自然样式，无背景框
       Text(spot.name)
-        .fontSize(12 * this.mapScale)
-        .fontColor('#FFFFFF')
-        .backgroundColor('#007DFF')
-        .padding({ 
-          left: 8 * this.mapScale, 
-          right: 8 * this.mapScale, 
-          top: 4 * this.mapScale, 
-          bottom: 4 * this.mapScale 
-        })
-        .borderRadius(4 * this.mapScale)
+        .fontSize(14 * this.mapScale)
+        .fontColor('#333333')
+        .fontWeight(FontWeight.Medium)
+        .fontFamily('sans-serif')
         .margin({ top: 4 * this.mapScale })
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .textShadow({ radius: 2, color: '#FFFFFF', offsetX: 1, offsetY: 1 })
     }
     .position({ 
       x: `${spot.x}%`, 

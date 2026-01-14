@@ -4,6 +4,7 @@ import picker from '@ohos.file.picker';
 import fs from '@ohos.file.fs';
 import image from '@ohos.multimedia.image';
 import { common } from '@kit.AbilityKit';
+import { TabBar } from '../components/TabBar';
 
 // 头像更新请求数据接口
 interface AvatarUpdateRequest {
@@ -134,6 +135,9 @@ struct Profile {
         // 退出登录按钮
         this.BuildLogoutButton()
       }
+
+      // 底部导航栏
+      TabBar({ currentPage: 'profile' })
     }
     .width('100%')
     .height('100%')
